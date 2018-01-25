@@ -88,7 +88,7 @@ def parseLine(line):
 	lineMap['checksum'] = line[line.index('[')+1:line.index(']')]
 	return lineMap
 
-class TestDay(unittest.TestCase):
+class TestDay4(unittest.TestCase):
 
 	def test1(self):
 		data = load('Day4.txt')

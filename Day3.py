@@ -49,7 +49,7 @@ def load2(path):
 				setOfThree = []
 	return data
 
-class TestDay(unittest.TestCase):
+class TestDay3(unittest.TestCase):
 
 	def test1(self):
 		data = load('Day3.txt')
