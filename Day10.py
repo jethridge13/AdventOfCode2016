@@ -7,7 +7,54 @@ def calc(data, x, y):
 	y is the second
 	Returns the number of the bot that handles both x and y
 	'''
+	bots = generateBots(data)
+	output = {}
 
+	# TODO Now that all the bots are set up, run through
+	botsToSend = []
+	for i in bots.keys():
+		botsToCheck = []
+		if len(bots[i]['values']) == 2:
+			# If bot is holding 2 values, check if those are the values
+			# for which we are searching
+			if x in bots[i]['values'] and y in bots[i]['values']:
+				return i
+			# Otherwise, distribute accordingly and then check
+			bots[i]['high'] = max(bots[i]['values'])
+			bots[i]['low'] = min(bots[i]['values'])
+			bots[i]['values'] = []
+			if bots[i]['rules']['highType'] == 'bot':
+				bots[bots[i]['rules']['high']]['values'].append(bots[i]['high'])
+				botsToCheck.append(bots[i]['high'])
+			else:
+				output[bots[i]['rules']['high']].append(bots[i]['high'])
+			if bots[i]['rules']['lowType'] == 'bot':
+				bots[bots[i]['rules']['low']]['values'].append(bots[i]['low'])
+				botsToCheck.append(bots[i]['low'])
+			else:
+				output[bots[i]['rules']['low']].append(bots[i]['low'])
+			del bots[i]['high']
+			del bots[i]['low']
+
+			while botsToCheck:
+				if len(botsToCheck[0]) == 2:
+					bot = botsToCheck[0]
+					bot['high'] = max(bot['values'])
+					bot['low'] = min(bot['values'])
+					bot['values'] = []
+					if bot['rules']['highType'] == 'bot':
+						bots[bot['rules']['high']]['values'].append(bot['high'])
+						botsToCheck.append(bot['high'])
+					else:
+						output[bot['rules']['high']].append(bot['high'])
+					if bot['rules']['lowType'] == 'bot':
+						bots[bot['rules']['low']]['values'].append(bot['low'])
+						botsToCheck.append(bots[i]['low'])
+					else:
+						output[bot['rules']['low']].append(bot['low'])
+					del bot['high']
+					del bot['low']
+				botsToCheck = botsToCheck[1:]
 	return -1
 
 def parseLine(line):
@@ -18,12 +65,35 @@ def parseLine(line):
 		data['value'] = int(words[1])
 		data['bot'] = int(words[5])
 		return data
-	data['sendBot'] = int(words[1])
+	data['bot'] = int(words[1])
 	data['low'] = int(words[6])
 	data['lowType'] = words[5]
 	data['high'] = int(words[11])
 	data['highType'] = words[10]
 	return data
+
+def generateBots(data):
+	bots = {}
+	for i in data:
+		rules = parseLine(i)
+		if rules['input'] == 'value':
+			# If bot takes input from input
+			bot = bots.get(rules['bot'], {})
+			# Add value to bots list of values
+			if not bot.get('values'):
+				bot['values'] = []
+			bot['values'].append(rules['value'])
+			bots[rules['bot']] = bot
+		elif rules['input'] == 'bot':
+			# If bot takes input from bot
+			sendBot = bots.get(rules['bot'], {})
+			botRules = {}
+			botRules['highType'] = rules['highType']
+			botRules['lowType'] = rules['lowType']
+			botRules['high'] = rules['high']
+			botRules['low'] = rules['low']
+			sendBot['rules'] = botRules
+	return bots
 
 def load(path):
 	data = []
@@ -47,15 +117,15 @@ class TestDay(unittest.TestCase):
 		t = 'bot 2 gives low to bot 1 and high to output 0'
 		parsedT = parseLine(t)
 		self.assertEqual(parsedT['input'], 'bot')
-		self.assertEqual(parsedT['sendBot'], 2)
+		self.assertEqual(parsedT['bot'], 2)
 		self.assertEqual(parsedT['low'], 1)
 		self.assertEqual(parsedT['lowType'], 'bot')
 		self.assertEqual(parsedT['high'], 0)
 		self.assertEqual(parsedT['highType'], 'output')
 
 if __name__ == '__main__':
-	unittest.main()
-	# Part 1: <160
-
+	#unittest.main()
+	# Part 1: <110
+	print(calc(load('Day10.txt'), 61, 17))
 	# Part 2:
 
