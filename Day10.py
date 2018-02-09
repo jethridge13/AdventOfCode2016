@@ -14,6 +14,8 @@ def calc(data, x, y):
 	botsToSend = []
 	for i in bots.keys():
 		botsToCheck = []
+		if not bots[i].get('values'):
+			bots[i]['values'] = []
 		if len(bots[i]['values']) == 2:
 			# If bot is holding 2 values, check if those are the values
 			# for which we are searching
@@ -24,11 +26,15 @@ def calc(data, x, y):
 			bots[i]['low'] = min(bots[i]['values'])
 			bots[i]['values'] = []
 			if bots[i]['rules']['highType'] == 'bot':
+				if not bots[bots[i]['rules']['high']].get('values'):
+					bots[bots[i]['rules']['high']]['values'] = []
 				bots[bots[i]['rules']['high']]['values'].append(bots[i]['high'])
 				botsToCheck.append(bots[i]['high'])
 			else:
 				output[bots[i]['rules']['high']].append(bots[i]['high'])
 			if bots[i]['rules']['lowType'] == 'bot':
+				if not bots[bots[i]['rules']['low']].get('values'):
+					bots[bots[i]['rules']['low']]['values'] = []
 				bots[bots[i]['rules']['low']]['values'].append(bots[i]['low'])
 				botsToCheck.append(bots[i]['low'])
 			else:
@@ -36,9 +42,14 @@ def calc(data, x, y):
 			del bots[i]['high']
 			del bots[i]['low']
 
+
 			while botsToCheck:
-				if len(botsToCheck[0]) == 2:
-					bot = botsToCheck[0]
+				if not bots[botsToCheck[0]].get('values'):
+					bots[botsToCheck[0]]['values'] = []
+				if len(bots[botsToCheck[0]]['values']) == 2:
+					bot = bots[botsToCheck[0]]
+					if x in bot['values'] and y in bot['values']:
+						return botsToCheck[0]
 					bot['high'] = max(bot['values'])
 					bot['low'] = min(bot['values'])
 					bot['values'] = []
@@ -55,6 +66,8 @@ def calc(data, x, y):
 					del bot['high']
 					del bot['low']
 				botsToCheck = botsToCheck[1:]
+			for i in bots.keys():
+				print(i, bots[i])
 	return -1
 
 def parseLine(line):
@@ -93,6 +106,7 @@ def generateBots(data):
 			botRules['high'] = rules['high']
 			botRules['low'] = rules['low']
 			sendBot['rules'] = botRules
+			bots[rules['bot']] = sendBot
 	return bots
 
 def load(path):
@@ -125,7 +139,7 @@ class TestDay(unittest.TestCase):
 
 if __name__ == '__main__':
 	#unittest.main()
-	# Part 1: <110
+	# Part 1: <106
 	print(calc(load('Day10.txt'), 61, 17))
 	# Part 2:
 
