@@ -1,13 +1,16 @@
 import unittest
 
-def calc(data):
-	reg = {}
-	reg['a'] = 0
-	reg['b'] = 0
-	reg['c'] = 0
-	reg['d'] = 0
+def calc(data, reg={}):
+	if not reg.get('a'):
+		reg['a'] = 0
+	if not reg.get('b'):
+		reg['b'] = 0
+	if not reg.get('c'):
+		reg['c'] = 0
+	if not reg.get('d'):
+		reg['d'] = 0
 	i = 0
-	while i < len(data) - 1:
+	while i < len(data):
 		line = parseIntoSegments(data[i])
 		#print(line, reg, i)
 		if line['ins'] == 'cpy':
@@ -71,7 +74,7 @@ class TestDay(unittest.TestCase):
 
 if __name__ == '__main__':
 	# unittest.main()
-	# Part 1: >317829
+	# Part 1: 318117
 	print(calc(load('Day12.txt')))
-	# Part 2:
-
+	# Part 2: 9227771
+	print(calc(load('Day12.txt'), {'c': 1}))
