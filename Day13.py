@@ -1,8 +1,49 @@
 import unittest
 
-def calc(coords, fav pos=[1, 1]):
+def calc(coords, fav, pos=[1, 1]):
 	# TODO Dynamically generate grid, then Dijkstra's
-	return -1
+	# Generate a grid of dimensions twice the size of target coords
+	# Does not guarantee a solution every time for odd inputs,
+	# but will be good enough for the problem.
+	grid = generateGrid(coords, fav)
+	grid[pos[1]][pos[0]] = 0
+	coordsToCheck = [pos]
+	while grid[coords[1]][coords[0]] == '.':
+		newCoords = []
+		for i in coordsToCheck:
+			newCoords.append(checkSurroundingCoords(i, grid))
+		coordsToCheck = newCoords
+	return grid[coords[1]][coords[0]]
+
+def checkSurroundingCoords(coords, grid):
+	# TODO
+	validSpots = []
+	if coords[0]-1 >= 0 and grid[coords[0]-1][coords[1]] == '.':
+		validSpots.append([coords[0]-1, coords[1]])
+	if coords[1]-1 >= 0 and grid[coords[0]][coords[1]-1] == '.':
+		validSpots.append([coords[0], coords[1]-1])
+	print(validSpots)
+	for i in validSpots:
+		grid[i[1]][i[0]] = grid[coords[1]][coords[0]] + 1
+	printGrid(grid)
+
+def generateGrid(coords, fav, debug=False):
+	grid = []
+	for i in range(coords[0] * 2):
+		line = []
+		for j in range(coords[1] * 2):
+			if getCoordinateStatus([j, i], fav):
+				line.append('#')
+			else:
+				line.append('.')
+		grid.append(line)
+	if debug:
+		printGrid(grid)
+	return grid
+
+def printGrid(grid):
+	for i in grid:
+		print(i)
 
 def getCoordinateStatus(coords, fav):
 	'''
