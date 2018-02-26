@@ -11,21 +11,28 @@ def calc(coords, fav, pos=[1, 1]):
 	while grid[coords[1]][coords[0]] == '.':
 		newCoords = []
 		for i in coordsToCheck:
-			newCoords.append(checkSurroundingCoords(i, grid))
+			newCoords += checkSurroundingCoords(i, grid)
 		coordsToCheck = newCoords
 	return grid[coords[1]][coords[0]]
 
 def checkSurroundingCoords(coords, grid):
-	# TODO
+	# TODO Still very buggy
 	validSpots = []
+	if not coords:
+		return validSpots
 	if coords[0]-1 >= 0 and grid[coords[0]-1][coords[1]] == '.':
-		validSpots.append([coords[0]-1, coords[1]])
+		validSpots.append([coords[1], coords[0]-1])
 	if coords[1]-1 >= 0 and grid[coords[0]][coords[1]-1] == '.':
-		validSpots.append([coords[0], coords[1]-1])
-	print(validSpots)
+		validSpots.append([coords[0]-1, coords[1]])
+	if coords[0]+1 < len(grid[coords[0]]) and grid[coords[0]+1][coords[1]] == '.':
+		validSpots.append([coords[0], coords[1]+1])
+	if coords[1]+1 < len(grid[coords[1]]) and grid[coords[0]][coords[1]+1] == '.':
+		validSpots.append([coords[0]+1, coords[1]])
 	for i in validSpots:
 		grid[i[1]][i[0]] = grid[coords[1]][coords[0]] + 1
+	print()
 	printGrid(grid)
+	return validSpots
 
 def generateGrid(coords, fav, debug=False):
 	grid = []
